@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>拾帧 · 分享物视觉样稿 v0.1</title>
+<style>
+  :root{
+    --bg:#f4f4f2; --surface:#ffffff; --surface-2:#faf9f7;
+    --text:#1c1917; --muted:#78716c; --line:#e7e5e4; --line-2:#d6d3d1;
+    --accent:#4d7c0f; --accent-soft:#ecfccb;
+    --shadow:0 1px 2px rgba(28,25,23,.04), 0 8px 24px rgba(28,25,23,.06);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:"HarmonyOS Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:1180px;margin:0 auto;padding:40px 24px 72px}
+
+  .head{margin-bottom:34px}
+  .eyebrow{margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:.16em;color:var(--accent)}
+  h1{margin:0 0 10px;font-size:26px;font-weight:600;letter-spacing:-.01em}
+  .lede{margin:0;max-width:720px;font-size:13.5px;line-height:1.75;color:var(--muted)}
+
+  h2{font-size:14px;font-weight:600;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  h2 .num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;background:var(--text);color:#fff;font-size:11px;font-weight:600}
+  .sub{margin:0 0 18px 29px;font-size:12.5px;line-height:1.7;color:var(--muted)}
+  section{margin-bottom:52px}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+  @media(max-width:900px){.split{grid-template-columns:1fr}}
+
+  /* 朋友圈语境 */
+  .wx{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;max-width:430px}
+  .wx-top{padding:14px 16px 0;display:flex;gap:11px;align-items:flex-start}
+  .avatar{width:38px;height:38px;border-radius:7px;flex:none;background:linear-gradient(135deg,#a3b18a,#6b8f3f)}
+  .wx-meta{padding-top:1px}
+  .wx-name{font-size:14px;font-weight:600;color:#3b5998;line-height:1.3}
+  .wx-time{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .wx-text{padding:9px 16px 12px;font-size:14px;line-height:1.62}
+  .wx-text b{color:var(--accent);font-weight:600}
+  .wx-media{margin:0 16px 12px;position:relative;border-radius:8px;overflow:hidden;background:#0d0f12}
+  .wx-media.longimg{background:#fff;border:1px solid var(--line)}
+  .wx-actions{display:flex;border-top:1px solid var(--line);height:38px}
+  .wx-actions div{flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);gap:5px}
+  .wx-actions div+div{border-left:1px solid var(--line)}
+  .dot{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--line-2)}
+
+  .note{margin:12px 0 0;font-size:12px;line-height:1.7;color:var(--muted);padding-left:12px;border-left:2px solid var(--line-2)}
+  .note b{color:var(--text);font-weight:600}
+
+  /* 视频帧卡 */
+  .frame{border-radius:9px;overflow:hidden;position:relative;aspect-ratio:9/16;display:flex;align-items:center;justify-content:center}
+  .ph{background:linear-gradient(150deg,#8a9a7b,#4a5a48)}
+  .ph2{background:linear-gradient(150deg,#c9b79c,#7d6a52)}
+  .ph3{background:linear-gradient(150deg,#7d92a8,#3f5266)}
+  .ph4{background:linear-gradient(150deg,#d4a373,#8a5a3b)}
+
+  /* 电影感 */
+  .cine{background:#08090b;color:#f5f5f4}
+  .cine .img{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden}
+  .cine .bar{position:absolute;left:0;right:0;height:9%;background:#000}
+  .cine .bar.t{top:0}.cine .bar.b{bottom:0}
+  .cine .cap{padding:16px 18px;font-size:10.5px;line-height:1.75;letter-spacing:.06em;color:#d6d3d1;text-align:center}
+  .cine .cap em{display:block;font-style:normal;font-size:12px;color:#f5f5f4;margin-bottom:6px;letter-spacing:.14em}
+
+  /* 画册感 */
+  .book{background:#fbfaf8;color:#1c1917}
+  .book .inner{padding:20px}
+  .book .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .book .cell{aspect-ratio:4/5;border-radius:2px}
+  .book .ft{margin-top:16px;border-top:.5px solid #ddd9d4;padding-top:11px;display:flex;justify-content:space-between;font-size:9.5px;color:#78716c;letter-spacing:.08em;font-family:Georgia,"Songti SC",serif}
+
+  /* 胶片感 */
+  .film{background:#f0ebe1;color:#292524}
+  .film .inner{padding:13px}
+  .film .pic{background:#fff;padding:8px 8px 26px;box-shadow:0 2px 8px rgba(41,37,36,.12);position:relative}
+  .film .pic .im{aspect-ratio:3/2}
+  .film .stamp{position:absolute;right:16px;bottom:7px;font-size:10px;color:#e07b39;font-family:"DS-Digital",ui-monospace,monospace;letter-spacing:.1em}
+
+  /* 时间轴 */
+  .timeline{display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap}
+  .slot{width:78px}
+  .slot .thumb{aspect-ratio:9/16;border-radius:7px;overflow:hidden;border:1px solid var(--line);position:relative}
+  .slot .lbl{margin-top:6px;font-size:10.5px;color:var(--muted);text-align:center;line-height:1.4}
+  .slot .lbl b{display:block;color:var(--text);font-size:11.5px;font-weight:600}
+
+  /* 品牌卡 */
+  .endcard{background:#08090b;border-radius:7px;aspect-ratio:9/16;padding:18px;display:flex;flex-direction:column;justify-content:flex-end;color:#f5f5f4}
+  .endcard .hook{font-size:13px;line-height:1.6;font-weight:600;margin-bottom:14px}
+  .endcard .hook span{color:#d9f99d}
+  .endcard .cta{background:#d9f99d;color:#1a2e05;border-radius:20px;padding:7px 0;text-align:center;font-size:11.5px;font-weight:600;margin-bottom:12px}
+  .endcard .brand{display:flex;align-items:center;gap:6px;font-size:10px;color:#a8a29e}
+  .endcard .mark{width:14px;height:14px;border-radius:4px;background:#d9f99d;flex:none}
+
+  .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:600;background:var(--accent-soft);color:var(--accent);margin-left:6px;vertical-align:1px}
+  .tag.g{background:#f5f5f4;color:var(--muted)}
+  .tag.r{background:#fee2e2;color:#b91c1c}
+
+  .cmp{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .cmp th,.cmp td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  .cmp th{background:var(--surface-2);font-weight:600;font-size:12px;color:var(--muted);white-space:nowrap}
+  .cmp tr:last-child td{border-bottom:none}
+  .cmp td:first-child{white-space:nowrap;font-weight:500}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="head">
+    <p class="eyebrow">SHIJIE · SHAREABLE v0.1</p>
+    <h1>分享物视觉样稿</h1>
+    <p class="lede">
+      分享物是这个产品的最终形态 —— 它是用户唯一会拿给外人看的东西，也是新用户的第一个触点。
+      以下在「朋友圈语境」中预览两种产物形态与三种风格的实际观感，用于评审选型。
+    </p>
+  </div>
+
+  <section>
+    <h2><span class="num">1</span>朋友圈语境预览 <span class="tag">产物 A · 视频</span></h2>
+    <p class="sub">视频在朋友圈以 9:16 卡片呈现，首帧即为标题卡。文案使用产品天然生成的数据作为钩子。</p>
+    <div class="split">
+      <div>
+        <div class="wx">
+          <div class="wx-top">
+            <div class="avatar"></div>
+            <div class="wx-meta">
+              <div class="wx-name">小孟同学</div>
+              <div class="wx-time">2 分钟前</div>
+            </div>
+          </div>
+          <div class="wx-text">这 <b>15</b> 张，是从 <b>832</b> 张里挑出来的。</div>
+          <div class="wx-media">
+            <div class="frame cine">
+              <div style="width:100%">
+                <div class="img ph"><div class="bar t"></div><div class="bar b"></div></div>
+                <div class="cap"><em>八 月 · 海 边</em>2026.08.02 — 08.14 · 15 帧</div>
+              </div>
+            </div>
+          </div>
+          <div class="wx-actions">
+            <div><span class="dot"></span>赞</div>
+            <div><span class="dot"></span>评论</div>
+            <div><span class="dot"></span>转发</div>
+          </div>
+        </div>
+        <p class="note"><b>钩子文案用数据不用口号。</b>「832 → 15」的反差是产品价值的最短表达，零成本、可信、不露广告相。若改为「快来下载拾帧」，扩散率会显著下降。</p>
+      </div>
+
+      <div>
+        <div class="wx">
+          <div class="wx-top">
+            <div class="avatar" style="background:linear-gradient(135deg,#c9b79c,#7d6a52)"></div>
+            <div class="wx-meta">
+              <div class="wx-name">林一</div>
+              <div class="wx-time">昨天</div>
+            </div>
+          </div>
+          <div class="wx-text">2026 年的 8 月，我留下了 15 帧。</div>
+          <div class="wx-media longimg">
+            <div class="frame book" style="aspect-ratio:3/4">
+              <div class="inner" style="width:100%">
+                <div class="grid">
+                  <div class="cell ph2"></div><div class="cell ph3"></div>
+                  <div class="cell ph"></div><div class="cell ph4"></div>
+                </div>
+                <div class="ft"><span>八月 · 海边</span><span>01 / 04</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="wx-actions">
+            <div><span class="dot"></span>赞</div>
+            <div><span class="dot"></span>评论</div>
+            <div><span class="dot"></span>转发</div>
+          </div>
+        </div>
+        <p class="note"><b>产物 B · 长图。</b>点开即看、可长按保存、可直送印刷。它与印刷稿共用同一套版式参数，是打印转化的前置资产。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">2</span>视频时间轴结构 <span class="tag g">12–18 秒</span></h2>
+    <p class="sub">首帧标题卡建立语境，中段照片序列承载情绪，尾帧品牌卡只占 1.5 秒且露出极小。</p>
+    <div class="timeline">
+      <div class="slot">
+        <div class="thumb"><div class="frame cine" style="aspect-ratio:auto;height:100%"><div style="width:100%;padding:12px 8px;text-align:center"><em style="font-style:normal;font-size:9px;letter-spacing:.1em;color:#f5f5f4;display:block;margin-bottom:8px">八 月 · 海 边</em><div style="font-size:7.5px;color:#a8a29e;letter-spacing:.06em">15 帧</div></div></div></div>
+        <div class="lbl"><b>0.8s</b>标题卡</div>
+      </div>
+      <div class="slot"><div class="thumb"><div class="frame ph" style="aspect-ratio:auto;height:100%"></div></div><div class="lbl"><b>1.5s</b>照片 01</div></div>
+      <div class="slot"><div class="thumb"><div class="frame ph3" style="aspect-ratio:auto;height:100%"></div></div><div class="lbl"><b>1.2s</b>照片 02</div></div>
+      <div class="slot"><div class="thumb"><div class="frame ph2" style="aspect-ratio:auto;height:100%"></div></div><div class="lbl"><b>1.8s</b>照片 03</div></div>
+      <div class="slot"><div class="thumb" style="border-color:var(--line-2);opacity:.55"><div class="frame ph4" style="aspect-ratio:auto;height:100%"></div></div><div class="lbl"><b>…</b>中段序列</div></div>
+      <div class="slot"><div class="thumb"><div class="frame ph2" style="aspect-ratio:auto;height:100%"></div></div><div class="lbl"><b>1.5s</b>照片 15</div></div>
+      <div class="slot" style="width:96px">
+        <div class="thumb"><div class="endcard" style="aspect-ratio:auto;height:100%;padding:12px">
+          <div class="hook" style="font-size:10px;margin-bottom:10px">这 15 张，是从 <span>832</span> 张里挑出来的</div>
+          <div class="cta" style="font-size:9.5px;padding:5px 0">我也要做</div>
+          <div class="brand"><span class="mark"></span>拾帧</div>
+        </div></div>
+        <div class="lbl"><b>1.5s</b>品牌卡</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">3</span>三种风格的观感对照</h2>
+    <p class="sub">风格选择同时是「视频 vs 长图」的权重选择：电影感偏视频，画册感偏长图，胶片感两者皆宜。</p>
+    <div class="split" style="grid-template-columns:repeat(3,1fr)">
+      <div>
+        <div class="frame cine" style="border:1px solid var(--line)">
+          <div style="width:100%">
+            <div class="img ph3"><div class="bar t"></div><div class="bar b"></div></div>
+            <div class="cap"><em>光 影 电 影 感</em>暗场 · 推镜 · 字幕</div>
+          </div>
+        </div>
+        <div class="lbl" style="margin-top:9px;text-align:center;font-size:11.5px;color:var(--text);font-weight:600">光影电影感</div>
+        <div class="lbl" style="text-align:center">视频 ★★★ ｜ 长图 ★★</div>
+      </div>
+      <div>
+        <div class="frame book" style="border:1px solid var(--line)">
+          <div class="inner">
+            <div class="grid"><div class="cell ph2"></div><div class="cell ph"></div><div class="cell ph4"></div><div class="cell ph3"></div></div>
+            <div class="ft"><span>简约画册感</span><span>01</span></div>
+          </div>
+        </div>
+        <div class="lbl" style="margin-top:9px;text-align:center;font-size:11.5px;color:var(--text);font-weight:600">简约画册感</div>
+        <div class="lbl" style="text-align:center">视频 ★★ ｜ 长图 ★★★</div>
+      </div>
+      <div>
+        <div class="frame film" style="border:1px solid var(--line)">
+          <div class="inner"><div class="pic"><div class="im ph"></div><div class="stamp">'26 08 14</div></div></div>
+        </div>
+        <div class="lbl" style="margin-top:9px;text-align:center;font-size:11.5px;color:var(--text);font-weight:600">胶片氛围感</div>
+        <div class="lbl" style="text-align:center">视频 ★★★ ｜ 长图 ★★</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">4</span>关键取舍与风险</h2>
+    <p class="sub">以下三项需要在进入开发前拍板。</p>
+    <table class="cmp">
+      <tr><th>议题</th><th>判断</th></tr>
+      <tr>
+        <td>视频是否进一期</td>
+        <td>视频是扩散主力，但移动端合成是全流程技术风险最高的一环（内存、编码、机型兼容）。<b>建议一期保留视频，但必须实现降级路径</b> —— 合成失败时自动降级为长图，并以同等仪式感呈现，绝不能只弹「生成失败」。</td>
+      </tr>
+      <tr>
+        <td>音乐版权</td>
+        <td>内置 BGM 必须使用免版税或自制音源。允许使用用户本地音乐在体验上更优，但存在<b>合规风险，需法务确认</b>后决定。</td>
+      </tr>
+      <tr>
+        <td>品牌露出强度</td>
+        <td>当前方案（尾帧 1.5 秒 + 长图 1.5% 高度）已是扩散效率与品牌曝光的合理平衡。<b>不建议再增强</b> —— 一旦被识别为广告，分享率会先于品牌收益崩塌。</td>
+      </tr>
+    </table>
+  </section>
+
+</div>
+</body>
+</html>
