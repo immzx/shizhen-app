@@ -255,6 +255,66 @@ git fetch origin && git merge FETCH_HEAD
 **关键约定**：`PROGRESS.md` 是唯一事实来源。任何一端修改进度后必须提交推送，
 否则其他端会基于过时信息工作。
 
+### 9.4 在新机器上接入（完整清单）
+
+新机器（如笔记本）要接续工作，按此清单执行。**本节设计为自包含，照做即可接入。**
+
+#### 前置条件
+
+- 已安装 WorkBuddy 与 Git
+- 磁盘可用 ≥ 60 GB；内存 ≥ 16 GB（推荐）或 ≥ 12 GB（勉强，须真机调试）
+
+#### 步骤
+
+**1. 生成 SSH 密钥**
+
+```bash
+ssh-keygen -t ed25519 -C "shizhen-dev" -f ~/.ssh/id_ed25519_github_shizhen
+cat ~/.ssh/id_ed25519_github_shizhen.pub
+```
+
+**2. 把公钥加入 GitHub**
+
+复制上一步输出的公钥，粘贴到 https://github.com/settings/keys
+**必须登录 `immzx` 账号**（不是 `mengshao0519-wq`）。
+
+**3. 配置 SSH host** —— 在 `~/.ssh/config` 添加：
+
+```
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_github_shizhen
+  IdentitiesOnly yes
+```
+
+**4. 验证连通**
+
+```bash
+ssh -T git@github.com
+# 期望输出：Hi immzx! You've successfully authenticated...
+```
+
+**5. 克隆仓库**
+
+```bash
+git clone git@github.com:immzx/shizhen-app.git 拾帧
+cd 拾帧
+git config user.name  "immzx"
+git config user.email "<你的 GitHub 邮箱>"
+```
+
+**6. 读 `PROGRESS.md`，按「三、接手指南」的顺序继续工作**
+
+#### 注意事项
+
+- **新机器上的 WorkBuddy 不自带本项目上下文。** 首次接续时，请明确提示 AI：
+  「读 `PROGRESS.md`，然后继续当前阶段的工作。」
+- 本项目 `PROGRESS.md` 刻意设计为**自包含**，读完即可接续，**不依赖对话历史**。
+- 若需回溯讨论细节，AI 可用 `conversation_search` 检索历史对话（云端能力，跨机器可用）。
+- **不要用 WorkBuddy 的 GitHub 连接器读写本仓库** —— 它绑定的是 `mengshao0519-wq` 账号，
+  只读且无法访问 `immzx` 的私有仓库。所有 GitHub 操作走本机 SSH。
+
 ---
 
 ## 十、待办与问题
