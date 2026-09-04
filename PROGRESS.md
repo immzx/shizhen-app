@@ -233,6 +233,11 @@ git commit -m "<类型>: <摘要>"
 git push origin main
 ```
 
+> **注意**：务必使用 `git push origin main` 的显式形式，不要用简写的 `git push`。
+> 本机环境下 remote-tracking 引用（`refs/remotes/origin/main`）无法持久化写入，
+> 简写形式与 `git pull` 可能异常，但**显式 push / fetch 均正常**。
+> 拉取更新时用：`git fetch origin && git merge FETCH_HEAD`。
+
 提交信息前缀约定：`docs`（文档）、`design`（设计稿）、`feat`（功能）、`fix`（修复）、`spike`（技术验证）、`chore`（杂项）。
 
 ### 9.3 在其他端接手
@@ -243,8 +248,8 @@ git clone git@github.com:immzx/shizhen-app.git 拾帧
 
 # 2. 读 PROGRESS.md（必读），按「三、接手指南」顺序读文档
 
-# 3. 开始工作前先拉取最新
-git pull origin main
+# 3. 开始工作前先拉取最新（本机环境请用显式形式）
+git fetch origin && git merge FETCH_HEAD
 ```
 
 **关键约定**：`PROGRESS.md` 是唯一事实来源。任何一端修改进度后必须提交推送，
